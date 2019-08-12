@@ -9,7 +9,7 @@ using System.IO;
 using System.Threading;
 using Newtonsoft.Json;
 
-namespace GoogleSheets
+namespace GoogleSheetsAPI_Example
 {
     class GSheets
     {
