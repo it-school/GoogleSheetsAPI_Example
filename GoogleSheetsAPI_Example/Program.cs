@@ -63,26 +63,56 @@ namespace GoogleSheetsAPI_Example
 
         static void CreateNewSheet()
         {
-            SheetsService service = GetService();
+            UserCredential credential;
 
-            var myNewSheet = new Spreadsheet();
-            myNewSheet.Properties = new SpreadsheetProperties();
-            myNewSheet.Properties.Title = "NewSheetExample";
+            using (var stream =
+                new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
+            {
+                string credPath = System.Environment.GetFolderPath(
+                    System.Environment.SpecialFolder.Personal);
+                credPath = Path.Combine(credPath, ".credentials/sheets.googleapis.com-dotnet-quickstart.json");
 
-            var sheet = new Sheet();
-            sheet.Properties = new SheetProperties();
-            sheet.Properties.Title = "Sheet1";
-//            myNewSheet.Properties.Sheets = new List<Sheet>() { sheet };
+                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    GoogleClientSecrets.Load(stream).Secrets,
+                    Scopes,
+                    "user",
+                    CancellationToken.None,
+                    new FileDataStore(credPath, true)).Result;
+                Console.WriteLine("Credential file saved to: " + credPath);
+            }
 
-            var newSheet = service.Spreadsheets.Create(myNewSheet).Execute();
+            var service = new SheetsService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = ApplicationName,
+            });
+
+            String spreadsheetId = "1d8RetomIySKDZp1e0bGSuDlKUEfiQQQR7uapifHABT0";
+            String range = "Sheet1!A10:D";
+            SpreadsheetsResource.ValuesResource.GetRequest request =
+                    service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+            ValueRange response = request.Execute();
+            IList<IList<Object>> values = response.Values;
+            if (values != null && values.Count > 0)
+            {
+                foreach (var x in values)
+                {
+                    //Rows.Add(x[0], x[1], x[2], x[3]);
+                }
+            }
+            else
+            {
+                Console.WriteLine("No data found.");
+            }
         }
 
         static void Main(string[] args)
         {
             GetDataFromGoogleSheetByID("1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms", "Class Data!A2:E");
-            // GetDataFromGoogleSheetByID("1d8RetomIySKDZp1e0bGSuDlKUEfiQQQR7uapifHABT0", "Class Data!A2:C");
+            //GetDataFromGoogleSheetByID("1d8RetomIySKDZp1e0bGSuDlKUEfiQQQR7uapifHABT0", "Class Data!A2:C");
 
-            //CreateNewSheet();
+            CreateNewSheet();
         }
     }
 }
