@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Google.Apis.Sheets.v4.Data;
+using System;
 using System.Collections.Generic;
 
 namespace GoogleSheetsAPI_Example
@@ -7,26 +8,21 @@ namespace GoogleSheetsAPI_Example
     {
         static void Main(string[] args)
         {
-           String spreadsheetId = "1DsTn1vCGNm38Kjcts6E6yBwd_IhmmMejjBXqkJIiCCU";
-            //spreadsheetId = "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms";
-            String range = "Sheets1!A2:C";
+            string spreadsheetId = "1DsTn1vCGNm38Kjcts6E6yBwd_IhmmMejjBXqkJIiCCU";
+            string range = "Sheets1!A2:C";
             GSheets sheets = new GSheets();
-            IList<IList<Object>>  result = sheets.GetData(spreadsheetId, range);
-            if (result != null && result.Count > 0)
-            {
-                Console.WriteLine("ID, Name, Income");
-                foreach (var row in result)
-                {
-                    Console.WriteLine("{0}, {1}, {2}", row[0], row[1], row[2]);
-                }
-            }
-            else
-            {
-                Console.WriteLine("No data found.");
-            }
+            Random r = new Random();
 
-            Console.WriteLine("DataAdd:\n");
-            sheets.AddData(spreadsheetId, range);
+            IList<IList<Object>>  result = sheets.GetData(spreadsheetId, range);
+            sheets.ShowData(result);
+
+            Console.WriteLine("DataAdd:");
+            string[] data = { (result.Count+1).ToString(), "NewData"+ (result.Count + 1), r.Next().GetHashCode().ToString()};
+            sheets.AddData(spreadsheetId, "Sheets1!A"+(result.Count+1), data);
+
+            sheets.ShowData(sheets.GetData(spreadsheetId, range));
+
+            Console.WriteLine("Создан новый файл: " + GSheets.CreateNewSheet.SpreadsheetUrl);
         }
     }
 }

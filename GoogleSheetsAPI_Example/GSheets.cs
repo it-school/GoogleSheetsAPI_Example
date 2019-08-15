@@ -15,7 +15,7 @@ namespace GoogleSheetsAPI_Example
     {
         static string[] Scopes = { SheetsService.Scope.Spreadsheets };
         static string ApplicationName = "GoogleSheets";
-        SheetsService Connect()
+        public static SheetsService Connect()
         {
             UserCredential credential;
 
@@ -55,17 +55,12 @@ namespace GoogleSheetsAPI_Example
             return values;
         }
 
-        public void AddData(String spreadsheetId, String range)
+        public void AddData(string spreadsheetId, string range, string[] data)
         {
             SheetsService sheetsService = Connect();
-            //sheetsService.Spreadsheets.Create(new Spreadsheet()).Execute(); ;
 
             ClearValuesRequest clearrequestBody = new ClearValuesRequest();
             //var result = sheetsService.Spreadsheets.Values.Clear(clearrequestBody, spreadsheetId, "Sheets1!A3:C").Execute();// Append( valueRange, spreadsheetId, "Sheets1!A6").Execute();
-
-
-
-            string range1 = "Sheets1!A2";  // TODO: Update placeholder value.
 
             ValueRange body = new ValueRange();
             List<Object> sub = new List<object>();
@@ -74,9 +69,9 @@ namespace GoogleSheetsAPI_Example
             list1.Add(sub);
             IList<IList<Object>> values = GetData(spreadsheetId, range);
             values.Clear();
-            values.Add(new List<Object>() { "dhxfhgkf", "Sgdzhtjydufky" });
+            values.Add(data);
             body.Values = values;
-            SpreadsheetsResource.ValuesResource.UpdateRequest request1 = sheetsService.Spreadsheets.Values.Update(body, spreadsheetId, range1);
+            SpreadsheetsResource.ValuesResource.UpdateRequest request1 = sheetsService.Spreadsheets.Values.Update(body, spreadsheetId, range);
             request1.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
             Console.WriteLine(request1.ValueInputOption);
             UpdateValuesResponse result = request1.Execute();
@@ -85,25 +80,18 @@ namespace GoogleSheetsAPI_Example
         }
 
 
-        public void CreateNewSheet()
-        {
-            String spreadsheetId = "1d8RetomIySKDZp1e0bGSuDlKUEfiQQQR7uapifHABT0";
-            String range = "Sheet1!A10:D";
-            SpreadsheetsResource.ValuesResource.GetRequest request = Connect().Spreadsheets.Values.Get(spreadsheetId, range);
+        public static Spreadsheet CreateNewSheet => Connect().Spreadsheets.Create(new Spreadsheet()).Execute();
 
-            ValueRange response = request.Execute();
-            IList<IList<Object>> values = response.Values;
-            if (values != null && values.Count > 0)
+        public void ShowData(object result)
+        {
+            if (result != null && ((IList<IList<object>>)result).Count > 0)
             {
-                foreach (var x in values)
-                {
-                    //Rows.Add(x[0], x[1], x[2], x[3]);
-                }
+                Console.WriteLine("ID, Name, Income");
+                foreach (IList<object> row in (IList<IList<object>>)result)
+                    Console.WriteLine("{0}, {1}, {2}", row[0], row[1], row[2]);
             }
             else
-            {
                 Console.WriteLine("No data found.");
-            }
         }
     }
 }
