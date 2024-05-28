@@ -1,5 +1,4 @@
-﻿using Google.Apis.Sheets.v4.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace GoogleSheetsAPI_Example
@@ -13,16 +12,16 @@ namespace GoogleSheetsAPI_Example
             GSheets sheets = new GSheets();
             Random r = new Random();
 
-            IList<IList<Object>>  result = sheets.GetData(spreadsheetId, range);
+            IList<IList<Object>> result = sheets.GetData(spreadsheetId, range);
             sheets.ShowData(result);
 
             Console.WriteLine("DataAdd:");
-            string[] data = { (result.Count+1).ToString(), "NewData"+ (result.Count + 1), r.Next().GetHashCode().ToString()};
-            sheets.AddData(spreadsheetId, "Sheets1!A"+(result.Count+1), data);
+            string[] data = { (result.Count + 1).ToString(), "NewData" + (result.Count + 1), r.Next().GetHashCode().ToString() };
+            sheets.AddData(spreadsheetId, "Sheets1!A" + (result.Count + 1), data);
 
             sheets.ShowData(sheets.GetData(spreadsheetId, range));
 
-            Console.WriteLine("Создан новый файл: " + GSheets.CreateNewSheet.SpreadsheetUrl);
+            // Console.WriteLine("Создан новый файл: " + GSheets.CreateNewSheet.SpreadsheetUrl);
         }
     }
 }
